@@ -91,6 +91,7 @@ def main():
           str(search_p) + "&page=" + str(1)
     # 总的页面数量
     page_nums = get_page_numbs(url)
+    path = make_new_dir(search_p)
     print("......正在获取图片......")
     # 开始从第一页爬取图片
     for index in range(page_nums):
@@ -98,7 +99,7 @@ def main():
          str(search_p) + "&page=" + str(index * 2 + 1)
         print("正在获取第%s页》》》" % (index + 1))
         html = get_html_page(url)
-        download(parse_html_page(html), index, make_new_dir(search_p))
+        download(parse_html_page(html), index, path)
         print("第%s页获取成功！" % (index + 1))
 
 
