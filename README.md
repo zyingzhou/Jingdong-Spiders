@@ -1,2 +1,4 @@
 # Spider-of-jingdong-products-images
-This spider for crawling products images of jingdong which is one of online sale platforms in China.
+## Introduction
+>This spider for crawling products images of [jingdong](https://www.jd.com/) which is one of online sale platforms in China.  
+>
