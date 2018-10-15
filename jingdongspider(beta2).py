@@ -1,4 +1,8 @@
-'''March 22,2018 Author: Zhiying Zhou'''
+#! /usr/bin/python
+# coding="utf-8"
+# March 22,2018 Author: zhouzying
+# Updated Oct 15,2018 Author
+# 获取京东商城男装商品全部图片
 from requests.exceptions import RequestException
 from urllib.request import urlretrieve
 from bs4 import BeautifulSoup
@@ -78,15 +82,3 @@ if __name__ == '__main__':
     pool.map(main, (index for index in range(100)))
     print("获取图片成功！\n")
     print("程序运行时间为{}".format(time.clock()))
-
-
-
-
-
-
-
-
-
-
-
-
