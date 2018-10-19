@@ -15,28 +15,50 @@ import re
 
 
 # 获取网页源代码
-def get_html(url):
-    try:
-        driver = webdriver.Chrome()
-        driver.get(url)
-        time.sleep(5)
-        # 执行页面向下滑至底部的动作
-        driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
-        # 停顿5秒等待页面加载完毕！！！（必须留有页面加载的时间，否则获得的源代码会不完整。）
-        time.sleep(5)
-        html_sourcode = driver.page_source
-        driver.close()
-        return html_sourcode
-    except RequestException:
-        print(RequestException)
+def main():
+    product = input("请输入商品名称：")
+    driver = webdriver.Chrome()
+
+    filepath = str(product) + ".txt"
+    # 商品个数计数
+    i = 1
+    # 页数控制
+    index = 1
+    # 设总页数total的初值为100
+    total = 100
+    while index < total:
+        try:
+
+            page = index * 2 - 1
+            # 关键字中如果有中文字符，URL中需加入“&enc=utf-8”字符编码
+            url = 'https://search.jd.com/Search?keyword=' + str(product) + "&enc=utf-8" + "&page=" + str(page)
+            driver.get(url)
+            # 执行页面向下滑至底部的动作
+            driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
+            # 停顿3秒等待页面加载完毕！！！（必须留有页面加载的时间，否则获得的源代码会不完整。）
+            time.sleep(3)
+            html = driver.page_source
+
+            total, i = parser(html, i, filepath)
+            print("第{}页获取完成！".format(index))
+            index += 1
+
+        except RequestException:
+            print(RequestException)
+            
+    print("关于{}的全部商品信息获取完成！".format(product))
+    # 退出浏览器
+    driver.quit()
 
 
+# 提取商品信息
 def parser(html, i, filepath):
 
     soup = BeautifulSoup(html, 'html5lib')
 
     # 总页数
     total = eval(soup.find('span', 'p-skip').em.b.text)
+    # 定位到包含这些商品信息的代码
     items = soup.find_all('div', 'gl-i-wrap')
 
     for item in items:
@@ -65,30 +87,6 @@ def parser(html, i, filepath):
         # 统计这一页有多少商品
         i += 1
     return total, i
-
-
-def main():
-    product = input("请输入您要获取图片的商品名称：")
-    # 关键字中如果有中文字符，URL中需加入“&enc=utf-8”字符编码
-    url = 'https://search.jd.com/Search?keyword=' + str(product) + "&enc=utf-8"
-    i = 1
-    html = get_html(url)
-    filepath = str(product) + ".txt"
-    total, i = parser(html, i, filepath)
-    print("第1页获取完成！")
-    # 页数控制
-    index = 2
-    while index <= total:
-        page = index * 2 - 1
-        # 用uri接收url的值
-        # url = url + "&page=" + str(page)会造成url随累加增长
-        uri = url + "&page=" + str(page)
-        html = get_html(uri)
-        total, i = parser(html, i, filepath)
-        print("第{}页获取完成！".format(index))
-        index += 1
-
-    print("关于{}的全部商品信息获取完成！".format(product))
 
 
 if __name__ == '__main__':
