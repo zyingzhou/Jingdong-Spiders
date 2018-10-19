@@ -1,8 +1,5 @@
 #! /usr/bin/python
 # coding='utf-8'
-# March 22,2018 Author: Zhiying Zhou
-# Updated April 19,2018 Author: Zhiying Zhou
-# Updated April 20,2018 added making new directory automatically according to the words that you searched.
 """
 获取京东商城商品图片的Python爬虫。输入商品的名称，便可以获取该商品的全部图片到本地。
 Author: 志颖
@@ -18,21 +15,46 @@ import re
 import os
 
 
-# 获取网页源代码
-def get_html_page(url):
-    try:
-        driver = webdriver.Firefox()
-        driver.get(url)
-        time.sleep(5)
-        # 执行页面向下滑至底部的动作
-        driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
-        # 停顿5秒等待页面加载完毕！！！（必须留有页面加载的时间，否则获得的源代码会不完整。）
-        time.sleep(5)
-        html_sourcode = driver.page_source
-        driver.close()
-        return html_sourcode
-    except RequestException:
-        print(RequestException)
+# 主函数
+def main():
+    # 获取商品名称
+    search_p = input("请输入您要获取图片的商品名称：")
+
+    # 设定总页数total的初值为100
+    total = 100
+    # 文件存储位置
+    path = make_new_dir(search_p)
+    # 页数控制
+    index = 1
+    print("......正在获取图片......")
+    driver = webdriver.Firefox()
+    while index <= total:
+
+        try:
+            print("正在获取第{}页》》》".format(index))
+            page = index * 2 - 1
+            url = "https://search.jd.com/Search?keyword=" + str(search_p) + "&enc=utf-8&page=" + str(page)
+            driver.get(url)
+            # 执行页面向下滑至底部的动作
+            driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
+            # 停顿5秒等待页面加载完毕！！！（必须留有页面加载的时间，否则获得的源代码会不完整。）
+            time.sleep(5)
+            html = driver.page_source
+            if index == 1:
+
+                total = get_page_numbs(html)
+            items = parse_html_page(html)
+
+            download(items, index, path)
+            print("第{}页获取成功！".format(index))
+            index += 1
+
+        except RequestException:
+            print(RequestException)
+
+    print("关于{}的全部商品信息获取完成！".format(search_p))
+    # 退出浏览器
+    driver.quit()
 
 
 # 提取网页的图片的网址
@@ -85,37 +107,14 @@ def download(items, index, path):
 
 
 # 定义一个函数来获取商品的页面数量
-def get_page_numbs(url):
-    html = get_html_page(url)
+def get_page_numbs(html):
+
     soup = BeautifulSoup(html, 'html5lib')
     pattern = '<i>(.*?)</i>'
     ls = re.findall(pattern, str(soup.find_all('span', 'fp-text')))
     # 用eval()函数取出整数
-    length = eval(ls[0])
-    return length
-
-
-def main():
-    # 获取商品名称
-    search_p = input("请输入您要获取图片的商品名称：")
-
-    # 构造网址
-    url = "https://search.jd.com/Search?keyword=" + str(search_p) + "&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&wq=" + \
-          str(search_p) + "&page=" + str(1)
-    # 总的页面数量
-    page_nums = get_page_numbs(url)
-    path = make_new_dir(search_p)
-    print("......正在获取图片......")
-    # 开始从第一页爬取图片
-    for index in range(page_nums):
-        url = "https://search.jd.com/Search?keyword=" + str(search_p) + "&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&wq=" + \
-         str(search_p) + "&page=" + str(index * 2 + 1)
-        print("正在获取第%s页》》》" % (index + 1))
-        html = get_html_page(url)
-        items = parse_html_page(html)
-
-        download(items, index, path)
-        print("第%s页获取成功！" % (index + 1))
+    total = eval(ls[0])
+    return total
 
 
 if __name__ == '__main__':
@@ -124,3 +123,4 @@ if __name__ == '__main__':
     main()
     print("获取图片成功！\n")
     print("程序运行时间为{}".format(time.clock()))
+    
