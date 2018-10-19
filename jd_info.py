@@ -6,8 +6,6 @@ Author: zhouzying
 URL: https://www.zhouzying.cn
 Date: 2018-10-15
 """
-
-from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 import time
 from selenium import webdriver
