@@ -26,7 +26,7 @@ def main():
     index = 1
     # 设总页数total的初值为100
     total = 100
-    while index < total:
+    while index <= total:
         try:
 
             page = index * 2 - 1
