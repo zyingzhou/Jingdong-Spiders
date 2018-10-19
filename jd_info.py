@@ -43,8 +43,8 @@ def main():
             print("第{}页获取完成！".format(index))
             index += 1
 
-        except RequestException:
-            print(RequestException)
+        except:
+            print('爬取失败！')
             
     print("关于{}的全部商品信息获取完成！".format(product))
     # 退出浏览器
