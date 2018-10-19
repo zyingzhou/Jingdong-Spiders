@@ -6,7 +6,6 @@ Author: 志颖
 URL：www.zhouzying.cn
 Data: 2018-10-15
 """
-from requests.exceptions import RequestException
 from urllib.request import urlretrieve
 from bs4 import BeautifulSoup
 import time
@@ -49,8 +48,8 @@ def main():
             print("第{}页获取成功！".format(index))
             index += 1
 
-        except RequestException:
-            print(RequestException)
+        except:
+            print('爬取失败！')
 
     print("关于{}的全部商品信息获取完成！".format(search_p))
     # 退出浏览器
